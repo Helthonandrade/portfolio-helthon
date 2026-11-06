@@ -1,0 +1,559 @@
+<title>Helthon Andráde · Potência</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Helthon Andráde, planner criativo, produtor executivo sênior e fundador da BAITA. Um reel, quatro desafios e os cases que provam cada poder.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Familjen+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Conceito: potência, não biografia.
+   Tela 0 é um reel de cortes secos com o manifesto. Dali, o visitante escolhe um desafio de marca.
+   Cada desafio abre um poder (Produzo, Engajo, Vendo, Invento) com os cases como capas de revista.
+   A trajetória fecha o site como créditos de filme. Clicar numa capa abre a camada 2 (cena, sala ou jogo). */
+:root{
+  --night:#0E100F; --chalk:#F1F3EE; --dim:#8E9894; --paper:#F4F1EA; --ink:#141614; --line:#2B312E;
+  --m:#ED1460; --o:#FF8A16; --y:#F5DE12; --l:#A7D82E;
+  --curva:linear-gradient(90deg,var(--m),var(--o) 36%,var(--y) 66%,var(--l));
+  --display:"Anton",Impact,"Arial Narrow Bold",sans-serif;
+  --body:"Familjen Grotesk","Helvetica Neue",Arial,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+  --gx:max(16px,env(safe-area-inset-left,0px)); --gxr:max(16px,env(safe-area-inset-right,0px));
+  --ease:cubic-bezier(.2,.8,.1,1);
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{height:100%}
+body{margin:0;background:var(--night);color:var(--chalk);font-family:var(--body);overflow:hidden;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer;text-align:inherit}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--y);outline-offset:3px}
+.grad{background:var(--curva);-webkit-background-clip:text;background-clip:text;color:transparent}
+.mono{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase}
+
+#app{position:fixed;inset:0;display:grid;grid-template-rows:auto minmax(0,1fr);grid-template-columns:minmax(0,1fr)}
+
+/* barra de comando */
+.top{position:relative;z-index:40;display:flex;align-items:center;gap:18px;padding:calc(10px + env(safe-area-inset-top,0px)) var(--gxr) 10px var(--gx);background:rgba(14,16,15,.88);border-bottom:1px solid var(--line);backdrop-filter:blur(8px)}
+.me{flex:none;font-family:var(--display);font-size:19px;text-transform:uppercase;line-height:1;padding-top:.12em}
+.me i{font-style:normal;display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--curva);margin-right:8px;vertical-align:.12em}
+.tabs{display:flex;gap:4px;margin-left:auto;overflow-x:auto;scrollbar-width:none;min-width:0}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex:none;display:flex;gap:8px;align-items:baseline;padding:8px 12px;border-radius:999px;font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);transition:color .2s,background .2s}
+.tab b{font-weight:600;color:inherit;opacity:.6}
+.tab:hover{color:var(--chalk)}
+.tab.cur{background:var(--chalk);color:var(--ink)}
+.tab.cur b{opacity:1}
+
+#stage{position:relative;overflow:hidden;touch-action:pan-y}
+.sc{position:absolute;inset:0;visibility:hidden;overflow:hidden}
+.sc.on{visibility:visible}
+
+/* corte entre telas */
+.cut{position:absolute;inset:0;z-index:30;pointer-events:none;display:grid;grid-template-columns:repeat(4,1fr)}
+.cut i{background:var(--curva);background-size:400% 100%;transform:scaleY(0);transform-origin:bottom}
+.cut i:nth-child(1){background-position:0 0}.cut i:nth-child(2){background-position:33% 0}.cut i:nth-child(3){background-position:66% 0}.cut i:nth-child(4){background-position:100% 0}
+.cut.run i{animation:slab .62s var(--ease) both;animation-delay:calc(var(--n) * 45ms)}
+@keyframes slab{0%{transform:scaleY(0);transform-origin:bottom}45%{transform:scaleY(1);transform-origin:bottom}55%{transform:scaleY(1);transform-origin:top}100%{transform:scaleY(0);transform-origin:top}}
+.sc.on .in{animation:rise .9s var(--ease) both;animation-delay:calc(var(--k,0) * 90ms + 200ms)}
+@keyframes rise{from{opacity:0;translate:0 50px}}
+.instant .sc.on .in,.instant .sc.on .cv{animation:none!important}
+.grain{position:absolute;inset:0;pointer-events:none;opacity:.08;z-index:3;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+
+/* ---------- REEL ---------- */
+.reel{position:absolute;inset:0}
+.reel img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transform:scale(1.04)}
+.reel img.on{opacity:1;animation:push 2.4s linear both}
+@keyframes push{from{transform:scale(1.1)}to{transform:scale(1.02)}}
+.reel::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(14,16,15,.55) 0%,rgba(14,16,15,.1) 30%,rgba(14,16,15,.35) 58%,rgba(14,16,15,.96) 100%)}
+.flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none;z-index:2}
+.flash.go{animation:flash .22s ease-out}
+@keyframes flash{from{opacity:.22}to{opacity:0}}
+.rhud{position:absolute;left:var(--gx);right:var(--gxr);top:16px;z-index:4;display:grid;gap:10px}
+.segs{display:flex;gap:4px}
+.segs button{flex:1;padding:10px 0;cursor:pointer}
+.segs button:hover i{background:rgba(241,243,238,.6)}
+.rctl{display:flex;gap:6px}
+.reel{cursor:pointer}
+.segs i{display:block;height:3px;background:rgba(241,243,238,.25);border-radius:2px;overflow:hidden;position:relative}
+.segs i.past{background:var(--chalk)}
+.segs i.now::after{content:"";position:absolute;inset:0;background:var(--chalk);transform-origin:left;animation:seg var(--dur,1700ms) linear both}
+.paused .segs i.now::after{animation-play-state:paused}
+@keyframes seg{from{transform:scaleX(0)}}
+.rmeta{display:flex;justify-content:space-between;gap:12px;align-items:center}
+.rmeta .mono{color:var(--chalk);text-shadow:0 1px 8px rgba(0,0,0,.6)}
+.pause{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;border:1px solid rgba(241,243,238,.5);border-radius:999px;padding:7px 12px;background:rgba(14,16,15,.4)}
+.say{position:absolute;left:var(--gx);right:var(--gxr);top:20%;z-index:4;margin:0;font-family:var(--display);font-weight:400;text-transform:uppercase;font-size:clamp(54px,10.5vw,200px);line-height:.86;letter-spacing:-.005em;max-width:12ch;text-shadow:0 6px 40px rgba(0,0,0,.35);padding-top:.08em}
+.say span{display:inline-block;clip-path:inset(0 0 0 0)}
+.say.hit span{animation:hit .9s var(--ease) both}
+@keyframes hit{from{clip-path:inset(0 100% 0 0);translate:-24px 0}}
+.rfoot{position:absolute;left:var(--gx);right:var(--gxr);bottom:calc(18px + env(safe-area-inset-bottom,0px));z-index:4;display:grid;gap:14px}
+.who{display:flex;flex-wrap:wrap;gap:6px 18px;align-items:baseline}
+.who h1{margin:0;font-family:var(--display);font-weight:400;text-transform:uppercase;font-size:clamp(26px,3vw,44px);line-height:1;padding-top:.1em}
+.who p{margin:0;font-size:clamp(14px,1.2vw,17px);color:#DCE1DD}
+.ask{display:flex;align-items:center;gap:12px}
+.ask b{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--y);font-weight:600}
+.ask i{flex:1;height:1px;background:rgba(241,243,238,.3)}
+.chal{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.cb{position:relative;display:grid;gap:6px;padding:14px 16px 14px;border:1px solid rgba(241,243,238,.28);border-radius:10px;background:rgba(14,16,15,.55);backdrop-filter:blur(6px);transition:background .25s,border-color .25s,translate .25s var(--ease);overflow:hidden}
+.cb::before{content:"";position:absolute;left:0;right:0;top:0;height:3px;background:var(--c)}
+.cb small{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim)}
+.cb strong{font-family:var(--display);font-weight:400;text-transform:uppercase;font-size:clamp(18px,1.7vw,26px);line-height:1;padding-top:.08em}
+.cb em{font-style:normal;font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--c)}
+.cb:hover,.cb:focus-visible{background:var(--chalk);color:var(--ink);border-color:var(--chalk);translate:0 -4px}
+.cb:hover small{color:#5c625f}
+
+/* ---------- PODERES ---------- */
+.pbg{position:absolute;inset:0}
+.pbg img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 1.4s;filter:grayscale(1) contrast(1.1) brightness(.5)}
+.pbg img.on{opacity:1}
+.pbg::before{content:"";position:absolute;inset:0;z-index:1;background:var(--tint);mix-blend-mode:multiply;opacity:.55}
+.pbg::after{content:"";position:absolute;inset:0;z-index:1;background:linear-gradient(90deg,rgba(14,16,15,.97) 0%,rgba(14,16,15,.85) 38%,rgba(14,16,15,.45) 100%)}
+.pw{position:relative;z-index:4;height:100%;display:grid;grid-template-columns:minmax(320px,.78fr) minmax(0,1.35fr);gap:clamp(18px,3vw,48px);padding:clamp(16px,3vh,32px) var(--gxr) clamp(16px,3vh,32px) var(--gx);overflow-y:auto;scrollbar-width:none}
+.pw::-webkit-scrollbar{display:none}
+.pcopy{display:grid;align-content:center;gap:14px;min-width:0}
+.dz{display:flex;gap:10px;align-items:center;color:var(--dim)}
+.dz i{width:28px;height:3px;background:var(--tint)}
+.chq{margin:0;font-family:var(--display);font-weight:400;text-transform:uppercase;font-size:clamp(22px,2.4vw,36px);line-height:1;padding-top:.08em;color:#DCE1DD}
+.chq::before{content:"“";color:var(--tint)}.chq::after{content:"”";color:var(--tint)}
+.verb{margin:0;font-family:var(--display);font-weight:400;text-transform:uppercase;font-size:clamp(72px,8.4vw,168px);line-height:.8;letter-spacing:-.01em;padding-top:.1em}
+.verb span{display:block}
+.verb small{display:block;font-size:.36em;line-height:1;-webkit-text-stroke:1.5px var(--chalk);color:transparent;margin-top:.12em;letter-spacing:.01em}
+.pline{margin:0;font-size:clamp(15px,1.15vw,18px);line-height:1.55;color:#D6DCD8;max-width:46ch}
+.proof{margin:0;padding:0;list-style:none;display:grid;gap:0;max-width:46ch}
+.proof li{display:flex;gap:12px;align-items:baseline;padding:9px 0;border-top:1px solid rgba(241,243,238,.14);font-size:15px}
+.proof li:last-child{border-bottom:1px solid rgba(241,243,238,.14)}
+.proof li::before{content:"→";color:var(--tint);font-family:var(--mono)}
+.nextc{justify-self:start;display:inline-flex;gap:10px;align-items:center;font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;background:var(--chalk);color:var(--ink);border-radius:999px;padding:12px 18px;transition:background .2s}
+.nextc:hover{background:var(--y)}
+
+/* capas */
+.rack{display:grid;gap:10px;align-content:safe center;min-height:0;grid-template-columns:repeat(var(--cols),minmax(0,1fr));grid-auto-rows:calc((100vh - 120px - 10px * (var(--rows) - 1)) / var(--rows));grid-auto-rows:calc((100dvh - 120px - 10px * (var(--rows) - 1)) / var(--rows))}
+.cv{position:relative;overflow:hidden;border-radius:6px;background:#1a1d1c;display:block;opacity:1;isolation:isolate;box-shadow:0 18px 40px rgba(0,0,0,.45)}
+.sc.on .cv{animation:cvin .8s var(--ease) both;animation-delay:calc(var(--j) * 70ms + 320ms)}
+@keyframes cvin{from{opacity:0;scale:1.08;clip-path:inset(0 0 100% 0)}to{clip-path:inset(0 0 0 0)}}
+.cv.lead{grid-column:span 2}
+.cv.tall{grid-row:span 2}
+.cv .ph{position:absolute;inset:0;z-index:-1}
+.cv .ph img{width:100%;height:100%;object-fit:cover;display:block;transition:scale .8s var(--ease),filter .5s;filter:saturate(.9)}
+.cv:hover .ph img,.cv:focus-visible .ph img{scale:1.06;filter:saturate(1.15)}
+.cv::after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(0,0,0,.45) 0%,transparent 32%,transparent 52%,rgba(0,0,0,.88) 100%)}
+.cvt{position:absolute;left:12px;right:12px;top:10px;display:grid;gap:6px;justify-items:start}
+.mast{font-family:var(--display);font-weight:400;text-transform:uppercase;font-size:clamp(26px,2.9vw,52px);line-height:.85;padding-top:.08em;letter-spacing:-.01em;color:#fff;overflow-wrap:anywhere}
+.cv.lead .mast,.cv.tall .mast{font-size:clamp(44px,6vw,112px)}
+.cv.tall .mast{font-size:clamp(38px,4.4vw,84px)}
+.iss{font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;background:var(--chalk);color:var(--ink);padding:3px 6px;border-radius:2px}
+.cvl{position:absolute;left:12px;right:12px;bottom:12px;display:grid;gap:4px;font-size:13px;line-height:1.3;color:#E8ECE9}
+.cvl b{font-family:var(--display);font-weight:400;text-transform:uppercase;font-size:clamp(17px,1.4vw,22px);line-height:1;color:#fff}
+.cv.lead .cvl b,.cv.tall .cvl b{font-size:clamp(22px,2vw,32px)}
+.cvl small{font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--tint)}
+.cv .gol{position:absolute;right:10px;bottom:10px;font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;background:var(--chalk);color:var(--ink);border-radius:999px;padding:6px 10px;opacity:0;translate:0 6px;transition:opacity .2s,translate .2s}
+.cv:hover .gol,.cv:focus-visible .gol{opacity:1;translate:0 0}
+.cv.txt .ph{display:grid;place-items:center;background:radial-gradient(circle at 30% 20%,color-mix(in srgb,var(--tint) 55%,#0E100F),#0E100F 75%)}
+.cv.txt .ph span{font-family:var(--display);text-transform:uppercase;font-size:clamp(26px,2.6vw,48px);line-height:.9;text-align:center;padding:40px 14px 50px;color:#fff}
+.cv.txt .ph small{display:block;font-family:var(--mono);font-size:9px;letter-spacing:.12em;margin-top:10px;color:var(--chalk);opacity:.7}
+
+/* ---------- CRÉDITOS ---------- */
+.cred{position:relative;z-index:4;height:100%;display:grid;grid-template-columns:minmax(0,1fr) minmax(320px,.9fr);gap:clamp(18px,4vw,64px);padding:0 var(--gxr) 0 var(--gx)}
+.roll{position:relative;overflow:hidden;-webkit-mask-image:linear-gradient(transparent,#000 18%,#000 82%,transparent);mask-image:linear-gradient(transparent,#000 18%,#000 82%,transparent)}
+.roll .col{position:absolute;left:0;right:0;top:0;display:grid;gap:34px;justify-items:center;text-align:center;padding:40vh 0;animation:roll 70s linear infinite}
+.roll:hover .col{animation-play-state:paused}
+@keyframes roll{to{translate:0 -100%}}
+.roll h4{margin:0 0 8px;font-family:var(--mono);font-size:11px;font-weight:400;letter-spacing:.2em;text-transform:uppercase;color:var(--dim)}
+.roll p{margin:0;font-family:var(--display);text-transform:uppercase;font-size:clamp(20px,2.1vw,32px);line-height:1.12}
+.roll .big{font-size:clamp(40px,5vw,84px);line-height:.9}
+.roll .yr{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.12em;color:var(--y);margin-top:6px}
+.endc{display:grid;align-content:center;gap:18px;min-width:0}
+.endc h2{margin:0;font-family:var(--display);font-weight:400;text-transform:uppercase;font-size:clamp(46px,6vw,104px);line-height:.86;padding-top:.08em}
+.endc p{margin:0;font-size:clamp(15px,1.2vw,18px);line-height:1.55;color:#D6DCD8;max-width:44ch}
+.contact{display:grid;margin:0;padding:0;list-style:none;max-width:540px}
+.contact li{display:flex;justify-content:space-between;align-items:center;gap:12px;border-top:1px solid var(--line);padding:13px 0}
+.contact li:last-child{border-bottom:1px solid var(--line)}
+.contact .k{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);margin-bottom:4px}
+.contact a,.contact .sel{font-size:clamp(16px,1.4vw,21px);text-decoration:none;user-select:all;overflow-wrap:anywhere}
+.contact a:hover{color:var(--y)}
+.copy-btn{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;border:1px solid var(--line);border-radius:999px;padding:8px 12px;flex:none}
+.again{justify-self:start;font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;border:1px solid var(--chalk);border-radius:999px;padding:11px 16px}
+.again:hover{background:var(--chalk);color:var(--ink)}
+
+/* camada 2: a cena */
+.room{position:fixed;inset:0;z-index:80;background:#0D100F;color:var(--chalk);display:grid;grid-template-rows:auto minmax(0,1fr);opacity:0;visibility:hidden;transition:opacity .35s,visibility 0s .35s}
+.room.open{opacity:1;visibility:visible;transition:opacity .35s}
+.room header{display:flex;align-items:center;gap:16px;padding:calc(12px + env(safe-area-inset-top,0px)) var(--gxr) 12px var(--gx);border-bottom:1px solid var(--line)}
+.room header .t{display:grid;gap:2px;flex:1;min-width:0}
+.room header .k{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
+.room header h2{margin:0;font-family:var(--display);font-weight:400;text-transform:uppercase;font-size:clamp(22px,2.6vw,34px);line-height:1}
+.room header .x{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;border:1px solid var(--chalk);border-radius:999px;padding:8px 14px;flex:none}
+.status{display:inline-block;font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;padding:6px 10px;border-radius:999px;background:var(--sc);color:#141011}
+.room-body{display:grid;grid-template-columns:minmax(0,1fr) 400px;min-height:0}
+.room-stage{position:relative;min-height:0;overflow:hidden;display:grid;padding:20px var(--gx)}
+.room-side{border-left:1px solid var(--line);overflow-y:auto;padding:24px var(--gxr) 30px 24px;display:grid;gap:18px;align-content:start;background:#141816}
+.room-side h3{margin:0;font-family:var(--mono);font-size:11px;font-weight:400;letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
+.room-side p{margin:0;font-size:15px;line-height:1.55;color:#D0D7D3}
+.room-side ul{margin:0;padding:0;list-style:none;display:grid;gap:8px}
+.room-side li{font-size:14px;line-height:1.45;color:#D0D7D3;padding-left:16px;position:relative}
+.room-side li::before{content:"";position:absolute;left:0;top:8px;width:7px;height:7px;border-radius:50%;background:var(--y)}
+.sheet{width:100%;border-collapse:collapse;font-size:14px;color:#D0D7D3}
+.sheet th{text-align:left;font-family:var(--mono);font-size:10px;font-weight:400;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);padding:8px 10px 8px 0;width:100px;vertical-align:top;border-top:1px solid var(--line)}
+.sheet td{padding:7px 0;border-top:1px solid var(--line);line-height:1.4}
+.links{display:grid;gap:8px}
+.links a{display:flex;justify-content:space-between;gap:12px;align-items:center;text-decoration:none;font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;background:var(--chalk);color:var(--ink);border-radius:8px;padding:14px 16px}
+.links a:hover{background:var(--y)}
+.links small{display:block;font-family:var(--body);font-size:12px;letter-spacing:0;text-transform:none;color:#4a4f4c;margin-top:3px}
+.ctrl{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.ctrl button{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;border:1px solid #3a423f;border-radius:999px;padding:10px 14px}
+.ctrl button:hover,.ctrl button.on{background:var(--chalk);color:var(--ink)}
+.ctrl .primary{background:var(--curva);color:#141011;border:0;font-weight:600}
+.draw{display:grid;grid-template-rows:auto minmax(0,1fr) auto;gap:16px;min-height:0}
+.draw-h{display:flex;justify-content:space-between;align-items:end;gap:16px;flex-wrap:wrap}
+.draw-h h3{margin:0;font-family:var(--display);font-weight:400;text-transform:uppercase;font-size:clamp(28px,3.4vw,52px);line-height:.9}
+.draw-h p{margin:4px 0 0;color:var(--dim);font-size:14px}
+.slots{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(10px,2vw,30px);align-items:center;justify-items:center;min-height:0}
+.slot{display:grid;gap:10px;justify-items:center;width:100%;max-width:260px}
+.slot .lbl{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);text-align:center}
+.tcard{width:100%;aspect-ratio:372/640;max-height:52vh;perspective:1200px}
+.tcard .in{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .9s var(--ease)}
+.tcard.up .in{transform:rotateY(180deg)}
+.tcard img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:10px;backface-visibility:hidden;-webkit-backface-visibility:hidden;box-shadow:0 20px 40px rgba(0,0,0,.6)}
+.tcard img.f{transform:rotateY(180deg)}
+.slot .nm{font-family:var(--display);text-transform:uppercase;font-size:22px;text-align:center;min-height:1.1em;line-height:1}
+.walk{display:grid;grid-template-rows:minmax(0,1fr) auto auto;gap:14px;min-height:0}
+.view{position:relative;min-height:0;border-radius:8px;overflow:hidden;background:#000}
+.view img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;opacity:0;transition:opacity .6s}
+.view img.on{opacity:1}
+.view .cap{position:absolute;left:0;right:0;bottom:0;padding:40px 20px 16px;background:linear-gradient(transparent,rgba(0,0,0,.85));display:grid;gap:4px}
+.view .cap span{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--y)}
+.view .cap b{font-family:var(--display);font-weight:400;text-transform:uppercase;font-size:clamp(20px,2.4vw,34px);line-height:1}
+.view .cap p{margin:0;font-size:14px;color:#dfe5e1;max-width:70ch}
+.path{position:relative;height:44px;margin:0 10px}
+.path::before{content:"";position:absolute;left:0;right:0;top:50%;height:3px;background:var(--pc,#ECEFE9);opacity:.35;transform:translateY(-50%);border-radius:2px}
+.path .fill{position:absolute;left:0;top:50%;height:3px;background:var(--pc,#ECEFE9);transform:translateY(-50%);transition:width .5s var(--ease);border-radius:2px}
+.path button{position:absolute;top:50%;width:22px;height:22px;border-radius:50%;transform:translate(-50%,-50%);background:#0D100F;border:3px solid var(--pc,#ECEFE9)}
+.path button.on{background:var(--pc,#ECEFE9);width:28px;height:28px}
+.path .act{position:absolute;top:-6px;font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);white-space:nowrap}
+.game-cta{display:inline-flex;gap:12px;align-items:center;justify-self:start;text-decoration:none;font-family:var(--display);text-transform:uppercase;font-size:24px;background:var(--curva);color:#141011;border-radius:999px;padding:12px 24px 10px}
+
+
+@media(max-width:900px){
+  .top{gap:10px}
+  .me{font-size:16px}
+  .say{top:13%;font-size:clamp(46px,14vw,100px)}
+  .chal{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .cb{padding:11px 12px}
+  .who p{display:none}
+  .pw{grid-template-columns:1fr;align-content:start;padding-bottom:40px}
+  .pcopy{align-content:start;padding-top:8px}
+  .rack{grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-rows:220px;align-content:start}
+  .pcopy{align-content:start}
+  .verb{font-size:clamp(64px,20vw,110px)}
+  .cv.tall{grid-row:auto}
+  .cv.lead,.cv.tall{grid-column:1/-1}
+  .cred{grid-template-columns:1fr;grid-template-rows:minmax(0,1fr) auto;padding-bottom:calc(16px + env(safe-area-inset-bottom,0px))}
+  .endc{gap:12px;padding-bottom:6px}
+  .endc p{display:none}
+  .room-body{grid-template-columns:1fr;grid-template-rows:auto auto;overflow-y:auto}
+  .room-stage{min-height:70vh}
+  .room-side{border-left:0;border-top:1px solid var(--line);overflow:visible}
+  .tcard{max-height:38vh}
+  .slot .nm{font-size:15px}
+  .path .act{display:none}
+}
+@media(max-width:520px){.tab{padding:7px 9px;font-size:10px}.tab .lbl{display:none}.tab.cur .lbl{display:inline}.me span{display:none}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition-duration:.01ms!important}.roll .col{position:static;padding:20px 0}.roll{overflow-y:auto}}
+</style>
+
+<div id="app">
+  <header class="top">
+    <button class="me" data-go="0" aria-label="Voltar ao reel"><i></i>Helthon <span>Andráde</span></button>
+    <nav class="tabs" id="tabs" aria-label="Seções"></nav>
+  </header>
+  <main id="stage" aria-live="polite"><div class="cut" id="cut" aria-hidden="true"><i style="--n:0"></i><i style="--n:1"></i><i style="--n:2"></i><i style="--n:3"></i></div></main>
+</div>
+
+<div class="room" id="room" role="dialog" aria-modal="true" aria-labelledby="roomT">
+  <header><div class="t"><span class="k" id="roomK"></span><h2 id="roomT"></h2></div><span class="status" id="roomS"></span><button class="x" id="roomX">Voltar</button></header>
+  <div class="room-body"><div class="room-stage" id="roomStage"></div><aside class="room-side" id="roomSide"></aside></div>
+</div>
+
+<script>
+(()=>{
+const $=s=>document.querySelector(s);
+const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const J='assets/jobs/';
+const FR={
+  shows:{n:'Shows & entretenimento',c:'#ED1460'},
+  brand:{n:'Brand experience',c:'#FF8A16'},
+  live:{n:'Live marketing',c:'#F5DE12'},
+  corp:{n:'Eventos corporativos',c:'#A7D82E'}
+};
+const NSCO='Produção executiva · nSco.';
+const JOBS=[
+ {id:'nadal',f:'shows',cli:'Nadal × Ruud',acao:'Rafa Nadal × Casper Ruud no Mineirinho',data:'26 nov/2022',local:'Mineirinho, Belo Horizonte',formato:'Exibição de tênis em arena + hospitalidade VIP',papel:'Meet & greet VIP e espaço VIP · nSco.',desc:'Partida de exibição entre Rafael Nadal e Casper Ruud no Mineirinho. Fiquei responsável pelo meet & greet extremamente VIP com Nadal para os maiores empresários do país e pelo espaço VIP com atendimento extra premium na arena.',img:['nadal-Bvktbc2','nadal-qVFC5Tg','nadal-gV7qnBP','nadal-wRtbm3d'],caps:['Nadal em quadra no Mineirinho','A arena lotada','Entrevista com Nadal','Cenário de marca para foto']},
+ {id:'planeta',f:'shows',cli:'Planeta Brasil',acao:'Palco Norte · 50 Cent e Ms. Lauryn Hill',data:'24 e 25 set/2022',local:'Esplanada do Mineirão, Belo Horizonte',formato:'Festival · 6 palcos, mais de 100 atrações',papel:'Produção artística do Palco Norte, o palco principal',desc:'Produção artística do palco principal nos dois dias. Sábado (24): Duda Beat, Criolo (com MC Carol e Mona Brutal), Natiruts, Sticky Fingers, Ty Dolla $ign e 50 Cent. Domingo (25): Marina Sena, Filipe Ret, Marcelo Falcão, Vintage Culture, 2 Chainz e Ms. Lauryn Hill.',img:['planeta-lauryn','planeta-50cent','planeta-dudabeat','planeta-marinasena'],caps:['Ms. Lauryn Hill · domingo, 22h30','50 Cent · sábado, 22h30','Duda Beat · sábado','Marina Sena · domingo'],cred:'Fotos: Festival Planeta Brasil / Divulgação (Lauryn Hill), Alexandre Guzanshe / Estado de Minas (50 Cent), Barbara Dutra / Planeta Brasil (Duda Beat) e Bruno Costa (Marina Sena). Uso a confirmar com os autores antes de publicar.'},
+ {id:'verao',f:'shows',cli:'SummerTimes Festival',acao:'Twins Summer Stage · Jack Johnson',data:'22 jan/2023',local:'Esplanada do Mineirão, Belo Horizonte',formato:'Festival de verão do Planeta Brasil · 4 palcos',papel:'Produção artística do palco principal',desc:'Produção artística do palco principal, o Twins Summer Stage, do meio-dia à madrugada: Negra Li e Drik Barbosa com Mac Júlia e Laura Sette, Maneva, EME, Gabriel O Pensador, Maria Rita, Silva, Nando Reis e Anavitória, Jack Johnson, Baco Exu do Blues, Matuê, Teto e Wiu e o set estendido de Vintage Culture.',img:['summer-jj2','summer-jj1'],caps:['Twins Summer Stage, o palco principal','O palco principal na Esplanada do Mineirão'],cred:'Fotos: Elberty Valadares / Por Dentro de Minas. Uso a confirmar com o autor antes de publicar.'},
+ {id:'palcos',f:'shows',cli:'Palcos',acao:'Festivais, shows e cultura',data:'2010 em diante',local:'Minas Gerais',formato:'Shows e festivais',papel:'Produção executiva e artística',desc:'Produção em festivais, shows, feiras e projetos culturais, com artistas como Elza Soares, Skank, Ney Matogrosso, Criolo e Los Hermanos, entre outros.',text:'Elza · Skank · Ney · Criolo · Los Hermanos'},
+ {id:'fire23',f:'brand',cli:'Hotmart',acao:'Fire Festival 2023',data:'ago/2023',local:'Belo Horizonte',formato:'Festival de marca',papel:NSCO,desc:'Festival de empreendedorismo digital da Hotmart: arena com palco central, escultura da chama, Hotmart Store, praça de alimentação, lounges, carro de Fórmula 1 da Red Bull, oficinas de marca e artistas circulando pelo espaço.',img:['fire-2023-3xtqQnw','fire-2023-kJGpSPc','fire-2023-qrDZwjF','fire-2023-CXBxfZd','fire-2023-MwVM5v8','fire-2023-mVnJc8m','fire-2023-5zGhWtZ','fire-2023-8s5NGxN','fire-2023-2V2xj8c','fire-2023-ht3LR6W','fire-2023-Cp6jCC8']},
+ {id:'fire24',f:'brand',cli:'Hotmart',acao:'Fire 2024 · Live your transformation',data:'ago/2024',local:'Belo Horizonte',formato:'Festival de marca',papel:NSCO,desc:'Edição 2024 do Fire com o tema “Live your transformation”: parede de marca, Fun Zone sob a cúpula, Hotmart Lounge, Hotmart Store, ativações de patrocinadores, credenciamento e área de imprensa.',img:['hotmart-fire-2024-rbNJSdD','hotmart-fire-2024-4gPGWVL','hotmart-fire-2024-tcVv2Qk','hotmart-fire-2024-KWGsQhn','hotmart-fire-2024-nsbrp3L','hotmart-fire-2024-3BrgW4V','hotmart-fire-2024-d7Jzwdv','hotmart-fire-2024-7kJWhdB','hotmart-fire-2024-FvQS4tV','hotmart-fire-2024-RM4V64W','hotmart-fire-2024-LvWWmkv']},
+ {id:'beup',f:'brand',cli:'Riva',acao:'Lançamentos imobiliários Riva',data:'Be Up · fev/2023',local:'Belo Horizonte',formato:'Eventos de lançamento',papel:NSCO,desc:'Vários eventos de lançamento de empreendimentos da Riva. O Be Up (fev/2023) foi um deles: palco iluminado, recepção de convidados, bar e cenários para foto.',img:['riva-beup-L2Rf2bF','riva-beup-jrN5J3M','riva-beup-SBDgx72'],caps:['Lançamento Be Up · fev/2023','Lançamento Be Up · fev/2023','Lançamento Be Up · fev/2023']},
+ {id:'spaten',f:'live',cli:'Spaten',acao:'Luta do Anderson Silva no Bar do Lopes',data:'15 jun/2024',local:'Bar do Lopes, Belo Horizonte',formato:'Ativação em bar com transmissão',papel:NSCO,desc:'Noite de transmissão da luta do Anderson Silva no Bar do Lopes, com cenografia Spaten Fight Night, cenário para foto e serviço de chope.',img:['luta-anderson-jbW99xL','luta-anderson-vZ2k9H3','luta-anderson-Pk9tdH7','luta-anderson-Z6pDLQz']},
+ {id:'arcelor',f:'corp',cli:'ArcelorMittal',acao:'Cliente recorrente · 2023 — 2024',data:'2023 — 2024',local:'Minas Gerais',formato:'Premiações, cultura, inovação e relacionamento',papel:NSCO,desc:'Cliente recorrente da nSco, com muitos eventos ao longo de 2023 e 2024: premiações, encontros de cultura, maratona de inovação e eventos de relacionamento. As fotos mostram alguns deles.',img:['arcelor-premiacao-2X4xGSh','arcelor-abr-9WZrhgx','arcelor-jul-32rzBtM','arcelor-out-RSbKWPf','arcelor-out-CmRGPtz','arcelor-out-hvznz3W','arcelor-mai24-FrLcXPN','arcelor-mai24-HdQm85J'],caps:['Premiação Excelência em Transporte · jan/2023','Encontro dos Embaixadores da Cultura · abr/2023','Evento ArcelorMittal · jul/2023','Maratona de Inovação · out/2023','Maratona de Inovação · out/2023','Maratona de Inovação · out/2023','Evento ArcelorMittal · mai/2024','Evento ArcelorMittal · mai/2024']},
+ {id:'vr',f:'corp',cli:'VR',acao:'Fim de ano em três cidades, no mesmo dia',data:'13 dez/2023',local:'Belo Horizonte, São Paulo e Curitiba',formato:'Evento corporativo em três praças simultâneas',papel:'Coordenação das três praças, ao mesmo tempo · nSco.',desc:'Festa de fim de ano da VR em Belo Horizonte, São Paulo e Curitiba na mesma noite, com coordenação simultânea das três praças. Cenografia “Aqui tem borogodó”, piscina de bolinhas e cenários para foto.',img:['vr-confra-6SBK9Px','vr-confra-nMPFzDF','vr-confra-W3C6ZcQ','vr-confra-78wPqXk']},
+ {id:'troopers',f:'brand',cli:'Hotmart',acao:'Troopers Party · festa de fim de ano',data:'2023',local:'Belo Horizonte e São Paulo, ao mesmo tempo',formato:'Festa de fim de ano em duas cidades simultâneas',papel:'Coordenação das duas praças, ao mesmo tempo · nSco.',desc:'Troopers Party, a festa de fim de ano da Hotmart, acontecendo ao mesmo tempo em Belo Horizonte e em São Paulo, com coordenação simultânea das duas praças.',text:'Troopers Party · BH + SP'},
+ {id:'localiza',f:'corp',cli:'Localiza',acao:'DNA de Vendas · convenção de vendas',data:'jun/2023',local:'Minas Gerais',formato:'Convenção de vendas, feira de negócios e festa',papel:NSCO,desc:'Convenção de vendas da Localiza, o DNA de Vendas: plenária com auditório cenografado em verde, ativação #SangueVerde e L&Co, feira de negócios com estandes e a festa de encerramento com os times.',img:['dna-localiza-srrJWKX', 'dna-localiza-bGCwgLQ', 'dna-localiza-bZVWTB3', 'dna-localiza-PFQwrK5', 'dna-localiza-h4cHN9Q', 'dna-localiza-JRX2bj6', 'dna-localiza-smtwzfK', 'dna-localiza-C3sQhX9', 'dna-localiza-CwTdmfS', 'dna-localiza-DxR4Tqt', 'dna-vendas-rMRQWkC', 'dna-vendas-t3pWbNZ', 'dna-vendas-n3v4BHR', 'dna-localiza-8WQKhrD', 'dna-localiza-xD6C6TX', 'dna-localiza-dmGprKk', 'dna-localiza-6JzcLBc', 'dna-localiza-xrG3pBN']},
+ {id:'itambe',f:'corp',cli:'Itambé',acao:'Convenções de Vendas 2023 e 2024',data:'2023 e 2024',local:'Minas Gerais',formato:'Convenção de vendas',papel:NSCO,desc:'Edições 2023 e 2024 da convenção do time comercial da Itambé. Em 2024, três dias com o tema “Medalhistas Itambé 2024 · Execução é nosso ouro”: plenária, palco de premiação, mascotes, gincanas e festa à noite. As fotos são da edição 2024 (jan/2024).',img:['itambe-668JgRn', 'itambe-7rgxQHV', 'itambe-mtcB69q', 'itambe-kx252xW', 'itambe-Z7FgGFk', 'itambe-4TkMpr7', 'itambe-pVpsPKh', 'itambe-pDmpH83', 'itambe-kKB8F8Z', 'itambe-9LzRkqm', 'itambe-GxDb7s8', 'itambe-QsL9JBv', 'itambe-rk4mC5k', 'itambe-z5q92tV']},
+];
+JOBS.forEach((j,i)=>j.n=String(i+1).padStart(2,'0'));
+const ERAS=[
+ {y:'2008—14',t:'Letras, Direito e câmera na mão',c:'#ED1460',i:['Letras (UFSJ) e Direito (IPTAN)','Fotografia e produção cultural','Inverno Cultural UFSJ','Festival de Tiradentes']},
+ {y:'2014—19',t:'Gestão cultural',c:'#FF5A2C',i:['Gestão Cultural (Una)','Cria! Cultura','Hertz Produz','Distrital · Agência Esfera']},
+ {y:'2019—22',t:'Evento em tela',c:'#FF8A16',i:['Do Brasil Live','Verbo Gentileza online','6º Salão do Livro de MG','TEDxSavassi · MBA Ágil']},
+ {y:'2022—24',t:'Marca em escala',c:'#F5DE12',i:['nSco. · produção executiva','Lauryn Hill e 50 Cent · 2022','Jack Johnson · 2023']},
+ {y:'2025—26',t:'Operação e planejamento',c:'#C9DC24',i:['Distrital · gerência de operações','Vendrá · produção sênior e planejamento','Textron, Unimed-BH, Boticário, Multiplan']},
+ {y:'jul/26',t:'BAITA',c:'#A7D82E',i:['Produtora e agência própria','BAITA produção · agência · OS']}
+];
+const ARC=['O Primeiro Gole','O Bartender','A Entrelinha','A Fartura','O Dono do Rolê','A Receita','O Match','O Carrinho','A Presença','O Último no Bar','A Roda do Rolê','A Comanda','O Pendurado','A Saideira','A Equilibrista','O Hype','O Chablau','A Fonte','A Madrugada','O Sol de Gingibre','O Bis','A Rua Inteira'];
+const ARCF=['00-o-primeiro-gole','01-o-bartender','02-a-entrelinha','03-a-fartura','04-o-dono-do-role','05-a-receita','06-o-match','07-o-carrinho','08-a-presenca','09-o-ultimo-no-bar','10-a-roda-do-role','11-a-comanda','12-o-pendurado','13-a-saideira','14-a-equilibrista','15-o-hype','16-o-chablau','17-a-fonte','18-a-madrugada','19-o-sol-de-gingibre','20-o-bis','21-a-rua-inteira'];
+const ROM=['0','I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII','XIII','XIV','XV','XVI','XVII','XVIII','XIX','XX','XXI'];
+const FUZE=[
+ ['hr-01-chegada', 'Chegada', 'A entrada pela rua, com guarda-sóis da marca e acesso organizado.'],
+ ['hr-02-tunel', 'Portal de entrada', 'Túnel de tecido colorido com a marca, que transforma a chegada em passagem.'],
+ ['hr-03-letras', 'Portal de letras', 'Palavras suspensas que projetam sombra no caminho do público.'],
+ ['hr-04-sinalizacao', 'Sinalização', 'Placas da marca guiam o percurso: piquenique na mata, deck com vista.'],
+ ['hr-05-gramado', 'Gramado vivo', 'Redário, pufes e cadeiras de praia à sombra das árvores.'],
+ ['hr-06-jogos', 'Jogos no gramado', 'Jogo da velha gigante e mesas baixas para o público ficar.'],
+ ['hr-07-xadrez', 'Xadrez gigante', 'Um tabuleiro no chão do parque, entre pufes FUZE.'],
+ ['hr-08-familias', 'Famílias', 'Crianças brincam no gramado enquanto os adultos descansam.'],
+ ['hr-09-palco', 'Palco no pôr do sol', 'Palco compacto com cobertura de tecido e show ao entardecer.'],
+ ['hr-10-deck', 'Deck com vista', 'A sinalização leva ao deck-mirante, com a cidade ao fundo.'],
+ ['hr-11-carrinho', 'Atendimento móvel', 'Carrinho da marca para servir o público pelo parque.'],
+ ['01_implantacao_percurso', 'Do 3D ao real', 'A planta 3D no Blender que sustenta tudo: o percurso da rua ao mirante.']
+];
+const PS=[
+ ['01-capa-serra','Ato 1','O Serra se move','Uma história de pertencimento, desejo e crescimento para a Power Shape.'],
+ ['02-territorio','Ato 1','O Serra não cabe numa rotina só','O bairro cresce para cima e preserva relações de décadas. Na mesma rua, a pressa de quem chegou e o ritual de quem fica.'],
+ ['03-personagens','Ato 1','A mesma rua, dois jeitos de viver o bairro','Marcos busca praticidade e resultado. Helena busca força, mobilidade e autonomia.'],
+ ['04-marcos','Ato 1','Marcos quer caber mais vida no dia','Pesquisa no celular antes de visitar. Se a informação demora, segue para a próxima opção.'],
+ ['05-helena','Ato 1','Helena quer continuar dona do próprio tempo','Sem acolhimento e prova de segurança, ela não atravessa a porta.'],
+ ['06-conflito','Ato 1','A mesma porta diz “entra” para um e “será?” para outra','Se a comunicação fala só com quem já é do universo fitness, a academia disputa o público de sempre.'],
+ ['07-estrategia','Ato 2','Dois caminhos, uma marca, uma história','Cada ação remove uma barreira específica e cria um motivo para entrar.'],
+ ['08-site-agendamento','Ato 2','O site como primeira ponte','Antes da primeira aula existe uma primeira prova: horários, estrutura, rostos e agendamento.'],
+ ['09-foto-video','Ato 2','A imagem mostra o que a promessa diz','Fotografia e vídeo com alunos e professores reais.'],
+ ['10-social','Ato 2','O Instagram faz a conversa continuar','O site responde. As redes mantêm a relação viva.'],
+ ['11-jornadas','Ato 2','Da curiosidade à rotina','A jornada conectada de cada personagem, do primeiro clique ao hábito.'],
+ ['12-parque-helena','Ato 3','Power Shape Sunset','Helena não precisa entrar na academia para conhecer a Power Shape: a marca vai ao parque.'],
+ ['14-power50','Ato 3','Power 50','Para Marcos, constância também pode virar status.'],
+ ['16-evento-interno','Ato 3','O convite entra na academia','Se o bairro não vai ao parque, a experiência acontece dentro da Power Shape.'],
+ ['17-mensuracao','Ato 4','Cada caminho deixa uma pista','Mensuração e aprendizado para saber o que trouxe cada aluno.'],
+ ['18-fechamento','Ato 4','Vamos construir essa história juntos?','Fechamento da proposta.']
+];
+const CASES=[
+ {id:'equilibrista',t:'Equilibrista · Tarot Urbano',st:'Proposta enviada',sc:'#A7D82E',k:'Brand experience 360°',img:'assets/equilibrista-tarot.jpg',how:'Tire as cartas',d:'Um baralho de 22 arcanos ligado aos drinks virou a plataforma da marca. Na proposta, o cliente tira as próprias cartas.',
+  sold:['Baralho de 22 arcanos ligado aos drinks, em envelopes surpresa vendidos com o produto','QR Code que leva às tiragens no site da marca, sem aplicativo','Tiragens interativas: do Rolê, do Match e do Equilíbrio','Golden Tickets com desconto no e-commerce','Ações de rua: Banca do Equilíbrio e Sunset Sound System','Régua de relacionamento (CRM)'],
+  how2:'A proposta foi entregue como site navegável, não como PDF. Junto, um baralho conceitual completo de 78 cartas para o cliente ver o produto antes de produzir.',
+  links:[['https://baita-planejamento.onrender.com','Abrir a proposta navegável','O site que a Equilibrista recebeu']]},
+ {id:'fuze',t:'FUZE · Parque Amílcar Vianna',st:'Projeto vetado',sc:'#B6B0A6',k:'Experiência espacial',img:'assets/fuze/hr-02-tunel.jpg',how:'Caminhe pelo parque',d:'Antes de montar qualquer estrutura, o cliente caminhou pelo parque: a ativação foi modelada em 3D, do portal ao deck.',
+  sold:['Ativação no deck-mirante do Parque Prof. Amílcar Vianna Martins, em BH','Portal de entrada, caminho de palavras, gramado com lounge, palco e jogos','Deck de cerca de 211 m² com letreiro e palco compacto na ponta sul','Estudos de acesso de artistas, sanitários para o público e capacidade'],
+  how2:'A venda juntou duas camadas: uma cena 3D no Blender, revisada em mais de 20 versões, para validar espaço, acessos e capacidade, e imagens hiper-realistas de cada parada do percurso, para o cliente ver a experiência como o público veria.',
+  links:[]},
+ {id:'powershape',t:'Power Shape · O Serra se move',st:'Conceito não enviado',sc:'#F5DE12',k:'Site + apresentação',img:'assets/powershape/03-personagens.jpg',how:'Acompanhe a história',d:'O reposicionamento de uma academia de bairro contado como Jornada do Herói, com dois personagens reais do Serra.',
+  sold:['Narrativa de marca com dois protagonistas: Marcos e Helena','Site com agendamento como primeira ponte','Foto, vídeo e redes sociais com pessoas reais','Power Shape Sunset no parque, Raspadinha, Power 50 e Passaporte','Experiência dentro da academia e mensuração por caminho'],
+  how2:'Além do roteiro em quatro atos, a BAITA construiu o site da academia e uma apresentação navegável, para o cliente ver a proposta funcionando.',
+  links:[['https://o-serra-se-move.onrender.com','Ver a apresentação navegável','O Serra se move'],['https://power-shape-ct.onrender.com','Ver o site criado','Site Power Shape CT com agendamento']]}
+];
+const GAMES=[
+ {id:'itapebi',t:'Atlas de Itapebi',k:'RPG educativo com quiz',url:'https://atlasitapebi.web.app',img:['assets/games/itapebi-capa.jpg','assets/games/itapebi-mapa.jpg','assets/games/itapebi-perguntas.jpg'],d:'Aventura com quiz, personagens e cenários de Itapebi (BA), com recursos para professores e salas online.',sold:['Mapa de missões ligado ao território da cidade','Quiz no estilo Enem com personagens e habilidades','Portal do professor e partidas em equipe']},
+ {id:'eunapolis',t:'Atlas de Eunápolis',k:'RPG educativo com quiz',url:'https://atlasdeeunapolis.web.app',img:['assets/games/eunapolis-capa.jpg','assets/games/eunapolis-mapa.jpg','assets/games/eunapolis-perguntas.jpg'],d:'RPG de perguntas no estilo Enem para o Colégio Estadual Eloyna Barradas, em Eunápolis (BA).',sold:['Banco de 300 perguntas com gabarito protegido','Contas, ranking e XP na nuvem','Portal do professor com salas online']},
+ {id:'orbita',t:'Órbita',k:'App de seleções musicais',url:'https://orbita-helthon.web.app',cta:'Entrar no Órbita',what:'O que tem no app',caps:['Os sentimentos','As nuances em leque','A cena do momento'],img:['assets/games/orbita-1.jpg','assets/games/orbita-2.jpg','assets/games/orbita-3.jpg'],d:'Um app que monta a trilha do momento: você toca num sentimento, escolhe a nuance e descreve a cena (atmosfera, lugar, atividade, luz, companhia). O Órbita cruza tudo e gera uma seleção que toca no Spotify.',sold:['Matriz de sentimentos com nuances que se abrem em leque','Cena opcional: atmosfera, lugar, atividade, luz e companhia','Seleção temporária, sem playlist fixa, tocando no Spotify','Histórico das seleções e uso no celular como app']},
+ {id:'taverna',t:'Noite na Taverna',k:'RPG narrativo',url:'https://noite-na-taverna.web.app',img:['assets/games/taverna-abertura-taverna.jpg','assets/games/taverna-porta-taverna.jpg','assets/games/taverna-mem-johann-rua-cor.jpg'],d:'RPG narrativo a partir da obra de Álvares de Azevedo (1855), para o ensino médio, feito para jogar no celular.',sold:['Memórias jogáveis de cada narrador da taverna','10 finais possíveis, de acordo com as escolhas','Som, efeitos e instalação no celular como app']}
+];
+
+
+const SHOTS=['Plano geral','Plano médio','Close','Detalhe','Plano aberto','Contraplano','Plano conjunto'];
+const job=id=>JOBS.find(j=>j.id===id);
+const src=x=>x.startsWith('assets/')?x:J+x+'.jpg';
+const pad=n=>String(n).padStart(2,'0');
+
+/* ---------- o reel: cortes secos com o manifesto ---------- */
+const REEL=[
+ ['arcelor-out-RSbKWPf','Eu não faço evento.','ArcelorMittal · Maratona de Inovação'],
+ ['hotmart-fire-2024-rbNJSdD','Eu faço marca virar lugar.','Hotmart · Fire 2024'],
+ ['nadal-Bvktbc2','Arena.','Nadal × Ruud · Mineirinho'],
+ ['planeta-lauryn','Palco principal.','Planeta Brasil · Ms. Lauryn Hill'],
+ ['vr-confra-6SBK9Px','Três cidades. Uma noite.','VR · fim de ano'],
+ ['luta-anderson-jbW99xL','Bar lotado.','Spaten · Bar do Lopes'],
+ ['arcelor-premiacao-2X4xGSh','Palco de premiação.','ArcelorMittal'],
+ ['dna-localiza-bZVWTB3','Cultura que se veste.','Localiza · DNA'],
+ ['assets/fuze/hr-02-tunel.jpg','Parque antes da montagem.','BAITA · FUZE'],
+ ['assets/equilibrista-tarot.jpg','Proposta que se joga.','BAITA · Equilibrista'],
+ ['itambe-7rgxQHV','Time no palco.','Itambé · Convenção'],
+ ['assets/games/taverna-abertura-taverna.jpg','Jogos.','BAITA · Noite na Taverna, Atlas de Itapebi e de Eunápolis'],
+ ['fire-2023-CXBxfZd','Do briefing ao desmonte.','Hotmart · Fire 2023']
+];
+
+/* ---------- os quatro poderes ---------- */
+const MAST={troopers:'Troopers',fire23:'Fire 23',fire24:'Fire 24',nadal:'Nadal',spaten:'Spaten',beup:'Riva',planeta:'Planeta',verao:'Summer',arcelor:'Arcelor',vr:'VR',localiza:'Localiza',itambe:'Itambé',equilibrista:'Equilibrista',fuze:'FUZE',powershape:'Power',taverna:'Taverna',itapebi:'Itapebi',eunapolis:'Eunápolis',orbita:'Órbita'};
+const P=[
+ {id:'produzo',n:'01',verb:'Produzo',ch:'Lotar uma arena',tint:'#ED1460',cols:4,rows:2,
+  line:'Festival de marca, arena, bar lotado e atração internacional. Ideia que para de pé: do rider ao desmonte, com a operação inteira na mão.',
+  proof:['Hotmart Fire, edições 2023 e 2024','Nadal × Ruud em arena, em BH','Palco principal: Planeta Brasil (50 Cent, Lauryn Hill) e SummerTimes (Jack Johnson)'],
+  items:[['job','fire23',1],['job','fire24'],['job','nadal'],['job','spaten'],['job','beup'],['job','planeta'],['job','verao']]},
+ {id:'engajo',n:'02',verb:'Engajo',ch:'Fazer o time vestir a marca',tint:'#A7D82E',cols:3,rows:2,
+  line:'Convenção, premiação, cultura interna e festa de fim de ano. Evento corporativo que o time lembra, em várias cidades, às vezes no mesmo dia.',
+  proof:['ArcelorMittal, cliente recorrente em 2023 e 2024','Praças simultâneas: VR em três cidades, Hotmart em BH e SP','Convenções de vendas Itambé 2023 e 2024 e DNA de Vendas Localiza'],
+  items:[['job','arcelor',1],['job','vr'],['job','troopers'],['job','localiza'],['job','itambe']]},
+ {id:'vendo',n:'03',verb:'Vendo',sub:'sem slide',ch:'Vender uma ideia sem slide',tint:'#FF8A16',cols:2,rows:2,
+  line:'Na BAITA, a proposta já é a primeira experiência da marca: o cliente tira as próprias cartas, caminha pelo parque antes da montagem e navega pela história de quem vai comprar dele.',
+  proof:['Proposta entregue como site navegável','Cena 3D para percorrer o espaço','Roteiro com personagens reais do bairro'],
+  items:[['case','equilibrista',2],['case','fuze'],['case','powershape']]},
+ {id:'invento',n:'04',verb:'Invento',sub:'mundos digitais',ch:'Transformar ideia em mundo digital',tint:'#F5DE12',cols:3,rows:2,
+  line:'A lógica da experiência levada para a tela: RPGs educativos e narrativos jogáveis no celular e o Órbita, um app que transforma o que você sente numa trilha sonora.',
+  proof:['Três jogos publicados, com quiz no estilo Enem, ranking e dez finais possíveis','Órbita: seleções musicais por sentimento e cena, tocando no Spotify','Tudo publicado e aberto para entrar'],
+  items:[['game','taverna',2],['game','itapebi'],['game','eunapolis'],['game','orbita',1]]}
+];
+const SC=[{id:'reel',tab:'Reel',n:'▶'},...P.map(p=>({id:p.id,tab:p.verb,n:p.n,p})),{id:'creditos',tab:'Créditos',n:'■'}];
+
+function coverHTML(it,k,tint){ const [t,id,big]=it; const cls=big===1?' lead':big===2?' tall':''; let img,iss,l1,l2,tag,open,txt='';
+  if(t==='job'){ const j=job(id); img=j.img?J+j.img[0]+'.jpg':null; iss=j.data; l1=j.cli; l2=j.acao; tag=j.papel; open='job:'+id; if(!img) txt=`<span>${j.text}<small>${j.papel} · ${j.local}</small></span>` }
+  else if(t==='case'){ const c=CASES.find(x=>x.id===id); img=c.img; iss=c.st; l1='BAITA · '+c.k; l2=c.d; tag=c.how+' →'; open='room:'+id }
+  else { const g=GAMES.find(x=>x.id===id); img=g.img[0]; iss='Publicado'; l1=g.t; l2=g.d; tag=g.k; open='room:'+id }
+  return `<button class="cv${cls}${img?'':' txt'}" style="--j:${k}" data-open="${open}" aria-label="${MAST[id]}: abrir"><span class="ph">${img?`<img src="${img}" alt="" loading="lazy">`:txt}</span><span class="cvt"><span class="mast">${MAST[id]}</span><span class="iss">Nº ${pad(k+1)} · ${iss}</span></span><span class="cvl"><small>${tag}</small><b>${l1}</b>${big?`<span>${l2}</span>`:''}</span><span class="gol">${t==='game'&&id!=='orbita'?'Jogar':'Entrar'} ↗</span></button>` }
+
+function bgList(p){ const out=[]; p.items.forEach(([t,id])=>{ if(t==='job'){ const j=job(id); if(j.img) out.push(J+j.img[0]+'.jpg', J+j.img[1]+'.jpg') } else if(t==='case'){ out.push(CASES.find(x=>x.id===id).img) } else { const g=GAMES.find(x=>x.id===id); out.push(...g.img.slice(0,2)) } }); return out.slice(0,6) }
+
+/* ---------- monta as telas ---------- */
+const stage=$('#stage'), tabs=$('#tabs');
+SC.forEach((s,i)=>{
+  const el=document.createElement('section'); el.className='sc'; el.id=s.id; el.setAttribute('aria-label',s.tab);
+  if(s.id==='reel'){
+    el.innerHTML=`<div class="reel" id="reelImgs">${REEL.map((r,k)=>`<img src="${src(r[0])}" alt="" ${k>2?'loading="lazy"':''}>`).join('')}</div><div class="flash" id="flash"></div><div class="grain"></div>
+    <div class="rhud"><div class="segs" id="segs">${REEL.map((r,k)=>`<button aria-label="Ir para o corte ${k+1}: ${r[1]}" data-cut="${k}"><i></i></button>`).join('')}</div><div class="rmeta"><span class="mono" id="rTag"></span><span class="rctl"><button class="pause" id="rPrev" aria-label="Corte anterior">‹</button><button class="pause" id="pause">❚❚ Pausar</button><button class="pause" id="rNext" aria-label="Próximo corte">›</button></span></div></div>
+    <p class="say" id="say"><span></span></p>
+    <div class="rfoot"><div class="who in" style="--k:0"><h1>Helthon <span class="grad">Andráde</span></h1><p>Planner criativo, produtor executivo sênior e fundador da BAITA. Eventos corporativos, brand experience, live marketing e shows.</p></div>
+    <div class="ask in" style="--k:1"><b>Qual é o seu desafio?</b><i></i></div>
+    <div class="chal in" style="--k:2">${P.map((p,k)=>`<button class="cb" style="--c:${p.tint}" data-go="${k+1}"><small>Desafio ${p.n}</small><strong>${p.ch}</strong><em>→ ${p.verb}${p.sub?' '+p.sub:''}</em></button>`).join('')}</div></div>`;
+  } else if(s.p){
+    const p=s.p, nx=P[P.indexOf(p)+1];
+    el.style.setProperty('--tint',p.tint);
+    el.innerHTML=`<div class="pbg">${bgList(p).map((b,k)=>`<img src="${b}" alt="" loading="lazy" class="${k?'':'on'}">`).join('')}</div><div class="grain"></div>
+    <div class="pw"><div class="pcopy"><span class="dz mono in" style="--k:0"><i></i>Desafio ${p.n} de 04</span><p class="chq in" style="--k:1">${p.ch}</p>
+      <h2 class="verb in" style="--k:2"><span class="grad">${p.verb}.</span>${p.sub?`<small>${p.sub}</small>`:''}</h2>
+      <p class="pline in" style="--k:3">${p.line}</p><ul class="proof in" style="--k:4">${p.proof.map(x=>'<li>'+x+'</li>').join('')}</ul>
+      <button class="nextc in" style="--k:5" data-go="${i+1}">${nx?`Próximo desafio: ${nx.ch} →`:'Ver os créditos →'}</button></div>
+    <div class="rack" style="--cols:${p.cols};--rows:${p.rows}">${p.items.map((it,k)=>coverHTML(it,k,p.tint)).join('')}</div></div>`;
+  } else {
+    const blocks=[
+     ['Direção, planejamento e produção executiva','<p class="big">Helthon <span class="grad">Andráde</span></p>'],
+     ['Primeiros enquadramentos · 2008 — 2014','<p>Letras · UFSJ</p><p>Direito · IPTAN</p><p>Fotografia</p><p>Inverno Cultural UFSJ</p><p>Festival de Tiradentes</p>'],
+     ['Gestão cultural · 2014 — 2019','<p>Gestão Cultural · Una</p><p>Cria! Cultura</p><p>Hertz Produz</p><p>Distrital</p><p>Agência Esfera</p>'],
+     ['No palco','<p>Elza Soares</p><p>Skank</p><p>Ney Matogrosso</p><p>Criolo</p><p>Los Hermanos</p><p>Ms. Lauryn Hill · 50 Cent<span class="yr">Planeta Brasil · Palco Norte · 2022</span></p><p>Jack Johnson<span class="yr">SummerTimes · palco principal · 2023</span></p>'],
+     ['Quando o público foi para casa · 2019 — 2022','<p>Do Brasil Live</p><p>Verbo Gentileza online</p><p>Minascon online</p><p>6º Salão do Livro de MG</p><p>TEDxSavassi</p><p>MBA em Metodologias Ágeis</p>'],
+     ['Produção executiva · nSco. · 2022 — 2024','<p>Hotmart<span class="yr">Fire 2023 e 2024 · Troopers Party BH + SP</span></p><p>ArcelorMittal</p><p>VR</p><p>Localiza</p><p>Itambé</p><p>Riva</p><p>Spaten</p>'],
+     ['Operações e planejamento · 2025 — 2026','<p>Distrital<span class="yr">Gerência geral de operações</span></p><p>Vendrá<span class="yr">Planejamento e produção executiva sênior</span></p><p>Textron Aviation</p><p>Unimed-BH</p><p>O Boticário</p><p>Multiplan</p>'],
+     ['Fundador · jul/2026','<p class="big"><span class="grad">BAITA</span></p><p>Produção · Agência</p>'],
+     ['Fotografia dos jobs nSco.','<p>Henrique Suarez · BS Fotografias</p>'],
+     ['Fotos dos festivais','<p>Festival Planeta Brasil · Barbara Dutra · Bruno Costa</p><p>Alexandre Guzanshe · Estado de Minas</p><p>Elberty Valadares · Por Dentro de Minas</p>'],
+     ['Imagens da BAITA e dos jogos','<p>Estudos, artes conceituais e protótipos próprios</p>']];
+    el.innerHTML=`<div class="pbg" style="--tint:#ED1460"><img class="on" src="${J}hotmart-fire-2024-rbNJSdD.jpg" alt="" loading="lazy"></div><div class="grain"></div>
+    <div class="cred"><div class="roll in" style="--k:0" aria-label="Créditos da trajetória"><div class="col">${blocks.map(b=>`<div><h4>${b[0]}</h4>${b[1]}</div>`).join('')}</div></div>
+    <div class="endc"><span class="dz mono in" style="--k:1;--tint:var(--y)"><i></i>Créditos · mais de 15 anos de estrada</span><h2 class="in" style="--k:2">O próximo case é <span class="grad">o seu.</span></h2><p class="in" style="--k:3">Se a sua ideia precisa sair da conversa e ganhar escala real, vamos colocar de pé juntos.</p>
+    <ul class="contact in" style="--k:4"><li><div><span class="k">E-mail</span><span class="sel" id="mail">contatohelthon@gmail.com</span></div><button class="copy-btn" id="copyMail">Copiar</button></li>
+     <li><div><span class="k">LinkedIn</span><a href="https://www.linkedin.com/in/helthon" target="_blank" rel="noreferrer">linkedin.com/in/helthon ↗</a></div></li>
+     <li><div><span class="k">BAITA</span><a href="https://www.baita.site" target="_blank" rel="noreferrer">www.baita.site ↗</a> · <a href="https://www.instagram.com/baita.ag" target="_blank" rel="noreferrer">@baita.ag ↗</a></div></li></ul>
+    <button class="again in" style="--k:5" data-go="0">↺ Rever o reel</button></div></div>`;
+  }
+  stage.append(el);
+  const t=document.createElement('button'); t.className='tab'; t.innerHTML=`<b>${s.n}</b><span class="lbl">${s.tab}</span>`; t.setAttribute('aria-label',s.tab); t.onclick=()=>go(i); tabs.append(t);
+});
+
+/* ---------- navegação ---------- */
+const secs=[...stage.querySelectorAll('.sc')], tb=[...tabs.children], cut=$('#cut'); let cur=-1, busy=false;
+function go(n,instant){ n=Math.max(0,Math.min(secs.length-1,n)); if(n===cur||busy) return; busy=true;
+  const swap=()=>{ if(cur>=0) secs[cur].classList.remove('on'); secs[n].classList.add('on'); const w=secs[n].querySelector('.pw'); if(w) w.scrollTop=0; cur=n; update() };
+  if(instant||RM||cur<0){ document.body.classList.add('instant'); swap(); busy=false; return }
+  document.body.classList.remove('instant'); cut.classList.remove('run'); void cut.offsetWidth; cut.classList.add('run');
+  setTimeout(swap,300); setTimeout(()=>{ busy=false; cut.classList.remove('run') },820) }
+function update(){ tb.forEach((t,i)=>{ t.classList.toggle('cur',i===cur); if(i===cur) t.setAttribute('aria-current','true'); else t.removeAttribute('aria-current') }); tb[cur].scrollIntoView({inline:'nearest',block:'nearest'});
+  if(cur===0) reelPlay(); else reelStop();
+  try{ history.replaceState(null,'','#'+SC[cur].id) }catch(_){} }
+document.addEventListener('click',e=>{ const g=e.target.closest('[data-go]'); if(g){ go(+g.dataset.go); return } const o=e.target.closest('[data-open]'); if(o){ const [t,id]=o.dataset.open.split(':'); t==='job'?openJob(id):openRoom(id) } });
+let acc=0, accT=0;
+stage.addEventListener('wheel',e=>{ if(room.classList.contains('open')) return; const w=secs[cur].querySelector('.pw'); if(w){ const dn=w.scrollTop+w.clientHeight<w.scrollHeight-2, upp=w.scrollTop>2; if((e.deltaY>0&&dn)||(e.deltaY<0&&upp)) return }
+  if(e.target.closest('.roll')) return;
+  e.preventDefault(); const now=performance.now(); if(now-accT>220) acc=0; accT=now; acc+=Math.abs(e.deltaY)>Math.abs(e.deltaX)?e.deltaY:e.deltaX; if(busy) return; if(acc>70){acc=0;go(cur+1)} else if(acc<-70){acc=0;go(cur-1)} },{passive:false});
+let tx=0,ty=0,tt=0; stage.addEventListener('touchstart',e=>{const p=e.touches[0];tx=p.clientX;ty=p.clientY;tt=performance.now()},{passive:true});
+stage.addEventListener('touchend',e=>{ const p=e.changedTouches[0], dx=p.clientX-tx, dy=p.clientY-ty; if(Math.abs(dx)>60&&Math.abs(dx)>Math.abs(dy)*1.5&&performance.now()-tt<700) go(cur+(dx<0?1:-1)) },{passive:true});
+addEventListener('keydown',e=>{ if(room.classList.contains('open')){ if(e.key==='Escape') closeRoom(); else if(roomKeys) roomKeys(e); return }
+  if(['ArrowRight','PageDown'].includes(e.key)){ e.preventDefault(); go(cur+1) } else if(['ArrowLeft','PageUp'].includes(e.key)){ e.preventDefault(); go(cur-1) } else if(e.key==='Home') go(0); else if(e.key==='End') go(secs.length-1); else if(e.key===' '&&cur===0&&e.target.tagName!=='BUTTON'){ e.preventDefault(); togglePause() } });
+
+/* ---------- motor do reel ---------- */
+const rImgs=[...document.querySelectorAll('#reelImgs img')], segs=[...document.querySelectorAll('#segs i')], say=$('#say'), DUR=k=>k===0?5200:k===1?4200:3200; let ri=-1, rT=0, paused=false;
+function cutTo(k){ ri=(k+REEL.length)%REEL.length; rImgs.forEach((im,j)=>im.classList.toggle('on',j===ri)); const nx=rImgs[(ri+1)%rImgs.length]; if(nx) nx.loading='eager';
+  segs.forEach((s,j)=>{ s.classList.toggle('past',j<ri); s.classList.remove('now') }); void segs[ri].offsetWidth; segs[ri].classList.add('now'); segs[ri].style.setProperty('--dur',DUR(ri)+'ms'); rImgs[ri].style.animationDuration=(DUR(ri)+800)+'ms';
+  say.classList.remove('hit'); say.firstElementChild.textContent=REEL[ri][1]; void say.offsetWidth; say.classList.add('hit');
+  $('#rTag').textContent=`Corte ${pad(ri+1)}/${pad(REEL.length)} · ${REEL[ri][2]}`; const f=$('#flash'); f.classList.remove('go'); void f.offsetWidth; f.classList.add('go') }
+function tick(){ clearTimeout(rT); if(paused||cur!==0||RM) return; rT=setTimeout(()=>{ cutTo(ri+1); tick() },DUR(ri)) }
+function reelPlay(){ if(ri<0) cutTo(0); tick() }
+function reelStop(){ clearTimeout(rT) }
+function togglePause(){ paused=!paused; $('#reel').classList.toggle('paused',paused); $('#pause').textContent=paused?'▶ Continuar':'❚❚ Pausar'; if(!paused){ cutTo(ri+1); tick() } else clearTimeout(rT) }
+$('#pause').onclick=togglePause;
+const jump=k=>{ cutTo(k); if(!paused) tick() };
+$('#reelImgs').addEventListener('click',e=>{ jump(ri+(e.clientX<innerWidth*.35?-1:1)) });
+$('#rPrev').onclick=()=>jump(ri-1); $('#rNext').onclick=()=>jump(ri+1);
+$('#segs').addEventListener('click',e=>{ const b=e.target.closest('[data-cut]'); if(b) jump(+b.dataset.cut) });
+if(RM){ paused=true; $('#pause').hidden=true }
+document.addEventListener('visibilitychange',()=>{ if(document.hidden) reelStop(); else if(cur===0) tick() });
+
+/* fundos dos poderes trocam devagar */
+setInterval(()=>{ if(cur<1||RM) return; const imgs=[...secs[cur].querySelectorAll('.pbg img')]; if(imgs.length<2) return; const k=imgs.findIndex(x=>x.classList.contains('on')); imgs[k].classList.remove('on'); const n=imgs[(k+1)%imgs.length]; n.loading='eager'; n.classList.add('on') },4200);
+
+/* ---------- camada 2: cenas, salas e jogos ---------- */
+const room=$('#room'); let roomKeys=null, roomLast=null, roomStop=null;
+function stepper(stage,items,{color,kicker,acts}){
+  stage.innerHTML=`<div class="walk"><div class="view" id="rv">${items.map((it,i)=>`<img src="${it.src}" alt="${it.t}" ${i>1?'loading="lazy"':''}>`).join('')}<div class="cap"><span id="rvk"></span><b id="rvt"></b><p id="rvd"></p></div></div><div class="path" style="--pc:${color}"><div class="fill" id="rvf"></div>${items.map((it,i)=>`<button aria-label="${i+1}. ${it.t}" style="left:${items.length>1?i/(items.length-1)*100:0}%"></button>`).join('')}${acts?acts.map(a=>`<span class="act" style="left:${a[1]/(items.length-1)*100}%">${a[0]}</span>`).join(''):''}</div><div class="ctrl"><button id="rvp">← Anterior</button><button id="rvn" class="primary">Próximo →</button><button id="rva">▶ Tocar sozinho</button><span style="font-family:var(--mono);font-size:11px;color:var(--dim)" id="rvc"></span></div></div>`;
+  const imgs=[...stage.querySelectorAll('.view img')], dots=[...stage.querySelectorAll('.path button')]; let i=0, auto=0;
+  const show=n=>{ i=(n+items.length)%items.length; imgs.forEach((im,k)=>im.classList.toggle('on',k===i)); dots.forEach((d,k)=>d.classList.toggle('on',k===i)); stage.querySelector('#rvf').style.width=(items.length>1?i/(items.length-1)*100:0)+'%'; stage.querySelector('#rvk').textContent=kicker(items[i],i); stage.querySelector('#rvt').textContent=items[i].t; stage.querySelector('#rvd').textContent=items[i].d; stage.querySelector('#rvc').textContent=`${i+1} / ${items.length}`; const nx=imgs[(i+1)%imgs.length]; if(nx) nx.loading='eager' };
+  const stopA=()=>{ clearInterval(auto); auto=0; const b=stage.querySelector('#rva'); if(b){b.textContent='▶ Tocar sozinho';b.classList.remove('on')} };
+  dots.forEach((d,k)=>d.onclick=()=>{stopA();show(k)}); stage.querySelector('#rvp').onclick=()=>{stopA();show(i-1)}; stage.querySelector('#rvn').onclick=()=>{stopA();show(i+1)};
+  stage.querySelector('#rva').onclick=e=>{ if(auto){stopA();return} e.currentTarget.textContent='❚❚ Pausar'; e.currentTarget.classList.add('on'); auto=setInterval(()=>show(i+1),3200) };
+  let sx=null; const v=stage.querySelector('#rv'); v.addEventListener('pointerdown',e=>sx=e.clientX); v.addEventListener('pointerup',e=>{ if(sx!=null&&Math.abs(e.clientX-sx)>40){stopA();show(i+(e.clientX<sx?1:-1))} sx=null });
+  roomKeys=e=>{ if(e.key==='ArrowRight'){stopA();show(i+1)} else if(e.key==='ArrowLeft'){stopA();show(i-1)} };
+  show(0); return stopA }
+function showRoom(){ room.classList.add('open'); setTimeout(()=>$('#roomX').focus(),60) }
+function resetRoom(){ roomLast=document.activeElement; if(roomStop) roomStop(); roomStop=null; roomKeys=null }
+function openJob(id){ const j=job(id); if(!j) return; resetRoom();
+  $('#roomK').textContent=`Cena · ${FR[j.f].n}`; $('#roomT').textContent=`${j.cli} · ${j.acao}`; $('#roomS').hidden=true;
+  const rows=[['Cliente',j.cli],['Ação',j.acao],['Data',j.data],['Local',j.local],['Formato',j.formato],['Meu papel',j.papel]];
+  $('#roomSide').innerHTML=`<p>${j.desc}</p><table class="sheet">${rows.map(r=>`<tr><th>${r[0]}</th><td>${r[1]}</td></tr>`).join('')}</table>${j.note?`<p style="font-size:12px;color:var(--dim)">${j.note}</p>`:''}${j.img?`<p style="font-family:var(--mono);font-size:10px;color:var(--dim)">${j.cred||'Fotos: Henrique Suarez / BS Fotografias, arquivo nSco.'}</p>`:''}`;
+  const st=$('#roomStage');
+  if(j.img) roomStop=stepper(st,j.img.map((n,k)=>({src:J+n+'.jpg',t:(j.caps&&j.caps[k])||`${j.cli} · ${j.acao}`,d:j.desc})),{color:FR[j.f].c,kicker:(it,k)=>`Foto ${k+1} de ${j.img.length} · ${j.local} · ${j.data}`});
+  else st.innerHTML=`<div style="display:grid;place-items:center;text-align:center;gap:16px;align-content:center"><span class="status" style="--sc:${FR[j.f].c}">${j.papel}</span><h3 style="margin:0;font-family:var(--display);font-weight:400;text-transform:uppercase;font-size:clamp(40px,7vw,110px);line-height:.9">${j.text}</h3><p style="margin:0;color:var(--dim)">${j.cli} · ${j.data} · ${j.local}</p><p style="margin:0;color:var(--dim);font-size:13px;max-width:44ch">Ainda sem fotos publicadas desta produção.</p></div>`;
+  showRoom(); try{ history.replaceState(null,'','#cena-'+id) }catch(_){} }
+function sideHTML(c,game){ const links=game?[[c.url,c.cta||'Entrar no jogo',c.url.replace('https://','')]]:c.links; return `<p>${c.d}</p>${game?'':`<h3>Como a BAITA vendeu</h3><p>${c.how2}</p>`}<h3>${game?(c.what||'O que tem no jogo'):'O que estava na proposta'}</h3><ul>${c.sold.map(x=>'<li>'+x+'</li>').join('')}</ul>${links.length?`<h3>${game?'Jogar':'Entrar no projeto'}</h3><div class="links">${links.map(l=>`<a href="${l[0]}" target="_blank" rel="noreferrer"><span>${l[1]}<small>${l[2]}</small></span><span>↗</span></a>`).join('')}</div>`:'<p style="color:var(--dim);font-size:13px">Projeto vetado pelo cliente: o estudo 3D fica como registro do método.</p>'}` }
+function openRoom(id){ const c=CASES.find(x=>x.id===id), g=GAMES.find(x=>x.id===id), it=c||g; if(!it) return; resetRoom();
+  $('#roomK').textContent=c?`BAITA · ${c.k}`:`Jogo · ${g.k}`; $('#roomT').textContent=it.t; const rs=$('#roomS'); if(c){ rs.hidden=false; rs.textContent=c.st; rs.style.setProperty('--sc',c.sc) } else rs.hidden=true;
+  $('#roomSide').innerHTML=sideHTML(it,!!g); const st=$('#roomStage');
+  if(id==='equilibrista'){
+    st.innerHTML=`<div class="draw"><div class="draw-h"><div><h3>Tiragem do Rolê</h3><p>Do jeito que o cliente da Equilibrista faria pelo QR Code: três cartas, três perguntas.</p></div><div class="ctrl"><button class="primary" id="dr">Embaralhar e tirar 3 cartas</button></div></div><div class="slots">${['O que te trouxe','O que te move','Pra onde vai o rolê'].map((l,k)=>`<div class="slot"><span class="lbl">${l}</span><div class="tcard" id="tc${k}"><div class="in"><img class="b" src="assets/tarot/verso.jpg" alt="Verso da carta"><img class="f" alt=""></div></div><span class="nm" id="tn${k}"></span></div>`).join('')}</div><p style="margin:0;font-family:var(--mono);font-size:11px;color:var(--dim)">22 arcanos maiores. Artes conceituais da proposta.</p></div>`;
+    const draw=()=>{ const pool=[...Array(22).keys()], pick=[]; for(let k=0;k<3;k++) pick.push(pool.splice(Math.floor(Math.random()*pool.length),1)[0]);
+      [0,1,2].forEach(k=>{ const tc=$('#tc'+k); tc.classList.remove('up'); $('#tn'+k).textContent=''; setTimeout(()=>{ const f=tc.querySelector('img.f'); f.src='assets/tarot/'+ARCF[pick[k]]+'.jpg'; f.alt=ARC[pick[k]]; const ok=()=>{ tc.classList.add('up'); setTimeout(()=>$('#tn'+k).textContent=ROM[pick[k]]+' · '+ARC[pick[k]],500) }; f.complete?ok():f.onload=ok },450+k*380) }) };
+    $('#dr').onclick=draw; [0,1,2].forEach(k=>$('#tc'+k).onclick=draw); setTimeout(draw,RM?0:500);
+  } else if(id==='fuze') roomStop=stepper(st,FUZE.map(f=>({src:'assets/fuze/'+f[0]+'.jpg',t:f[1],d:f[2]})),{color:'#FF8A16',kicker:(it,i)=>`Percurso · parada ${i+1} de ${FUZE.length}`});
+  else if(id==='powershape') roomStop=stepper(st,PS.map(f=>({src:'assets/powershape/'+f[0]+'.jpg',t:f[2],d:f[3],a:f[1]})),{color:'#E5322D',kicker:(it,i)=>`${it.a} · capítulo ${i+1}`,acts:[['Ato 1 · o bairro',0],['Ato 2 · as pontes',6],['Ato 3 · a rua',11],['Ato 4',14]]});
+  else { roomStop=stepper(st,g.img.map((src,k)=>({src,t:(g.caps||['Capa','Mapa','Em jogo'])[k]||g.t,d:g.d})),{color:'#FF5A2C',kicker:()=>g.t}); st.querySelector('.ctrl').insertAdjacentHTML('afterbegin',`<a class="game-cta" href="${g.url}" target="_blank" rel="noreferrer">${g.cta||'Entrar no jogo'} ↗</a>`) }
+  showRoom(); try{ history.replaceState(null,'','#sala-'+id) }catch(_){} }
+function closeRoom(){ if(roomStop) roomStop(); roomStop=null; roomKeys=null; room.classList.remove('open'); try{ history.replaceState(null,'','#'+SC[cur].id) }catch(_){} roomLast&&roomLast.focus&&roomLast.focus({preventScroll:true}) }
+$('#roomX').onclick=closeRoom;
+
+
+/* copiar e-mail */
+document.addEventListener('click',e=>{ const b=e.target.closest('#copyMail'); if(!b) return; const ok=()=>{b.textContent='Copiado';setTimeout(()=>b.textContent='Copiar',1600)}, fb=()=>{ const s=getSelection(), r=document.createRange(); r.selectNodeContents($('#mail')); s.removeAllRanges(); s.addRange(r); b.textContent='Selecionado' }; try{ navigator.clipboard.writeText('contatohelthon@gmail.com').then(ok,fb) }catch(_){ fb() } });
+
+/* início */
+const h=location.hash.slice(1), mj=h.match(/^cena-([a-z0-9]+)$/), ms=h.match(/^sala-([a-z]+)$/);
+let start=Math.max(0,SC.findIndex(s=>s.id===h));
+const owner=id=>SC.findIndex(s=>s.p&&s.p.items.some(it=>it[1]===id));
+if(mj&&owner(mj[1])>0) start=owner(mj[1]); if(ms&&owner(ms[1])>0) start=owner(ms[1]);
+go(start,true);
+if(mj) setTimeout(()=>openJob(mj[1]),300); if(ms) setTimeout(()=>openRoom(ms[1]),300);
+})();
+</script>
