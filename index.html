@@ -258,6 +258,8 @@ a{color:inherit}
   .slot .nm{font-size:15px}
   .path .act{display:none}
 }
+@media(hover:none){.cv .gol{opacity:1;translate:0 0}}
+@media(max-width:900px){.cvl small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:rgba(241,243,238,.75)}.room header{gap:10px}.room header .k{display:none}.room header h2{font-size:20px}.room header .status{font-size:9px;padding:5px 8px}.rmeta .mono{font-size:10px}.view{min-height:46vh}}
 @media(max-width:520px){.tab{padding:7px 9px;font-size:10px}.tab .lbl{display:none}.tab.cur .lbl{display:inline}.me span{display:none}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition-duration:.01ms!important}.roll .col{position:static;padding:20px 0}.roll{overflow-y:auto}}
 </style>
@@ -372,6 +374,7 @@ const SHOTS=['Plano geral','Plano médio','Close','Detalhe','Plano aberto','Cont
 const job=id=>JOBS.find(j=>j.id===id);
 const src=x=>x.startsWith('assets/')?x:J+x+'.jpg';
 const pad=n=>String(n).padStart(2,'0');
+const sm=p=>p.replace('assets/','assets/m/');
 
 /* ---------- o reel: cortes secos com o manifesto ---------- */
 const REEL=[
@@ -416,7 +419,7 @@ function coverHTML(it,k,tint){ const [t,id,big]=it; const cls=big===1?' lead':bi
   if(t==='job'){ const j=job(id); img=j.img?J+j.img[0]+'.jpg':null; iss=j.data; l1=j.cli; l2=j.acao; tag=j.papel; open='job:'+id; if(!img) txt=`<span>${j.text}<small>${j.papel} · ${j.local}</small></span>` }
   else if(t==='case'){ const c=CASES.find(x=>x.id===id); img=c.img; iss=c.st; l1='BAITA · '+c.k; l2=c.d; tag=c.how+' →'; open='room:'+id }
   else { const g=GAMES.find(x=>x.id===id); img=g.img[0]; iss='Publicado'; l1=g.t; l2=g.d; tag=g.k; open='room:'+id }
-  return `<button class="cv${cls}${img?'':' txt'}" style="--j:${k}" data-open="${open}" aria-label="${MAST[id]}: abrir"><span class="ph">${img?`<img src="${img}" alt="" loading="lazy">`:txt}</span><span class="cvt"><span class="mast">${MAST[id]}</span><span class="iss">Nº ${pad(k+1)} · ${iss}</span></span><span class="cvl"><small>${tag}</small><b>${l1}</b>${big?`<span>${l2}</span>`:''}</span><span class="gol">${t==='game'&&id!=='orbita'?'Jogar':'Entrar'} ↗</span></button>` }
+  return `<button class="cv${cls}${img?'':' txt'}" style="--j:${k}" data-open="${open}" aria-label="${MAST[id]}: abrir"><span class="ph">${img?`<img src="${img}" srcset="${sm(img)} 960w, ${img} 1800w" sizes="(max-width: 900px) 50vw, 34vw" alt="" loading="lazy">`:txt}</span><span class="cvt"><span class="mast">${MAST[id]}</span><span class="iss">Nº ${pad(k+1)} · ${iss}</span></span><span class="cvl"><small>${tag}</small><b>${l1}</b>${big?`<span>${l2}</span>`:''}</span><span class="gol">${t==='game'&&id!=='orbita'?'Jogar':'Entrar'} ↗</span></button>` }
 
 function bgList(p){ const out=[]; p.items.forEach(([t,id])=>{ if(t==='job'){ const j=job(id); if(j.img) out.push(J+j.img[0]+'.jpg', J+j.img[1]+'.jpg') } else if(t==='case'){ out.push(CASES.find(x=>x.id===id).img) } else { const g=GAMES.find(x=>x.id===id); out.push(...g.img.slice(0,2)) } }); return out.slice(0,6) }
 
@@ -434,7 +437,7 @@ SC.forEach((s,i)=>{
   } else if(s.p){
     const p=s.p, nx=P[P.indexOf(p)+1];
     el.style.setProperty('--tint',p.tint);
-    el.innerHTML=`<div class="pbg">${bgList(p).map((b,k)=>`<img src="${b}" alt="" loading="lazy" class="${k?'':'on'}">`).join('')}</div><div class="grain"></div>
+    el.innerHTML=`<div class="pbg">${bgList(p).map((b,k)=>`<img src="${sm(b)}" alt="" loading="lazy" class="${k?'':'on'}">`).join('')}</div><div class="grain"></div>
     <div class="pw"><div class="pcopy"><span class="dz mono in" style="--k:0"><i></i>Desafio ${p.n} de 04</span><p class="chq in" style="--k:1">${p.ch}</p>
       <h2 class="verb in" style="--k:2"><span class="grad">${p.verb}.</span>${p.sub?`<small>${p.sub}</small>`:''}</h2>
       <p class="pline in" style="--k:3">${p.line}</p><ul class="proof in" style="--k:4">${p.proof.map(x=>'<li>'+x+'</li>').join('')}</ul>
