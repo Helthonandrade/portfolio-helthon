@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: portfolio-helthon
+    runtime: static
+    buildCommand: python3 build.py
+    staticPublishPath: dist
+    domains:
+      - portfolio.baita.site
+    headers:
+      - path: /assets/*
+        name: Cache-Control
+        value: public, max-age=604800
