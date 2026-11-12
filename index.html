@@ -133,6 +133,17 @@ a{color:inherit}
 .sc.on .cv{animation:cvin .8s var(--ease) both;animation-delay:calc(var(--j) * 70ms + 320ms)}
 @keyframes cvin{from{opacity:0;scale:1.08;clip-path:inset(0 0 100% 0)}to{clip-path:inset(0 0 0 0)}}
 .cv.lead{grid-column:span 2}
+.cv.dataC{grid-column:span 2;display:grid;grid-template-rows:auto minmax(0,1fr);gap:12px;padding:16px 18px;background:linear-gradient(160deg,#1c1a17,#121514 60%);border:1px solid rgba(255,138,22,.35);overflow:hidden}
+.cv.dataC::after{display:none}
+.dh{display:grid;gap:4px}
+.dh small{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--o)}
+.dh b{font-family:var(--display);font-weight:400;text-transform:uppercase;font-size:clamp(20px,1.9vw,32px);line-height:1;padding-top:.08em}
+.stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;min-height:0}
+.st{display:grid;align-content:start;gap:4px;padding:10px 12px;border-radius:6px;background:rgba(241,243,238,.05);text-decoration:none;transition:background .2s}
+.st:hover{background:rgba(241,243,238,.1)}
+.st b{font-family:var(--display);font-weight:400;font-size:clamp(24px,2.4vw,40px);line-height:1;padding-top:.08em;background:var(--curva);-webkit-background-clip:text;background-clip:text;color:transparent}
+.st span{font-size:clamp(12px,.9vw,14px);line-height:1.35;color:#DCE1DD}
+.st small{font-family:var(--mono);font-size:9px;letter-spacing:.06em;color:var(--dim)}
 .cv.tall{grid-row:span 2}
 .cv .ph{position:absolute;inset:0;z-index:-1}
 .cv .ph img{width:100%;height:100%;object-fit:cover;display:block;transition:scale .8s var(--ease),filter .5s;filter:saturate(.9)}
@@ -141,7 +152,7 @@ a{color:inherit}
 .cvt{position:absolute;left:12px;right:12px;top:10px;display:grid;gap:6px;justify-items:start}
 .mast{font-family:var(--display);font-weight:400;text-transform:uppercase;font-size:clamp(26px,2.9vw,52px);line-height:.85;padding-top:.08em;letter-spacing:-.01em;color:#fff;overflow-wrap:anywhere}
 .cv.lead .mast,.cv.tall .mast{font-size:clamp(44px,6vw,112px)}
-.cv.tall .mast{font-size:clamp(38px,4.4vw,84px)}
+.cv.tall .mast{font-size:clamp(30px,3.3vw,64px)}
 .iss{font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;background:var(--chalk);color:var(--ink);padding:3px 6px;border-radius:2px}
 .cvl{position:absolute;left:12px;right:12px;bottom:12px;display:grid;gap:4px;font-size:13px;line-height:1.3;color:#E8ECE9}
 .cvl b{font-family:var(--display);font-weight:400;text-transform:uppercase;font-size:clamp(17px,1.4vw,22px);line-height:1;color:#fff}
@@ -243,7 +254,9 @@ a{color:inherit}
   .who p{display:none}
   .pw{grid-template-columns:1fr;align-content:start;padding-bottom:40px}
   .pcopy{align-content:start;padding-top:8px}
-  .rack{grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-rows:220px;align-content:start}
+  .rack{grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-rows:minmax(220px,auto);align-content:start}
+  .cv.dataC{grid-column:1/-1}
+  .stats{grid-template-columns:1fr}
   .pcopy{align-content:start}
   .verb{font-size:clamp(64px,20vw,110px)}
   .cv.tall{grid-row:auto}
@@ -424,10 +437,10 @@ const P=[
   line:'Convenção, premiação, cultura interna e festa de fim de ano. Evento corporativo que o time lembra, em várias cidades, às vezes no mesmo dia.',
   proof:['ArcelorMittal, cliente recorrente em 2023 e 2024','Praças simultâneas: VR em três cidades, Hotmart em BH e SP','Convenções de vendas Itambé 2023 e 2024 e DNA de Vendas Localiza'],
   items:[['job','arcelor',1],['job','vr'],['job','troopers'],['job','localiza'],['job','itambe']]},
- {id:'vendo',n:'03',verb:'Vendo',sub:'sem slide',ch:'Vender uma ideia sem slide',tint:'#FF8A16',cols:2,rows:2,
-  line:'Na BAITA, a proposta já é a primeira experiência da marca: o cliente tira as próprias cartas, caminha pelo parque antes da montagem e navega pela história de quem vai comprar dele.',
+ {id:'vendo',n:'03',verb:'Vendo',sub:'sem slide',ch:'Vender uma ideia sem slide',tint:'#FF8A16',cols:3,rows:2,
+  line:'Slide se esquece. Experiência se compra. Na BAITA, a proposta já é a primeira experiência da marca: o cliente tira as próprias cartas, caminha pelo parque antes da montagem e navega pela história de quem vai comprar dele. Ele decide vivendo a ideia, não ouvindo sobre ela.',
   proof:['Proposta entregue como site navegável','Cena 3D para percorrer o espaço','Roteiro com personagens reais do bairro'],
-  items:[['case','equilibrista',2],['case','fuze'],['case','powershape']]},
+  items:[['case','equilibrista',2],['case','fuze'],['case','powershape'],['data','vendo']]},
  {id:'invento',n:'04',verb:'Invento',sub:'mundos digitais',ch:'Transformar ideia em mundo digital',tint:'#F5DE12',cols:3,rows:2,
   line:'A lógica da experiência levada para a tela: RPGs educativos e narrativos jogáveis no celular e o Órbita, um app que transforma o que você sente numa trilha sonora.',
   proof:['Três jogos publicados, com quiz no estilo Enem, ranking e dez finais possíveis','Órbita: trilha por sentimento e cena, nos maiores catálogos de música independente do mundo','Tudo publicado e aberto para entrar'],
@@ -435,13 +448,19 @@ const P=[
 ];
 const SC=[{id:'reel',tab:'Reel',n:'▶'},...P.map(p=>({id:p.id,tab:p.verb,n:p.n,p})),{id:'creditos',tab:'Créditos',n:'■'}];
 
-function coverHTML(it,k,tint){ const [t,id,big]=it; const cls=big===1?' lead':big===2?' tall':''; let img,iss,l1,l2,tag,open,txt='';
+const DATA=[
+ ['85%','dos consumidores tendem a comprar depois de viver uma experiência de marca, e 91% passam a gostar mais dela.','EventTrack 2018 · Event Marketer e Mosaic','https://www.eventmarketer.com/wp-content/uploads/2018/06/eventtrack2018execsumm.pdf'],
+ ['10% → 65%','é quanto se lembra de uma informação três dias depois: só ouvindo, contra vendo uma imagem.','John Medina · Brain Rules','https://www.brainrules.net/vision'],
+ ['67%','dos compradores B2B preferem decidir sem um vendedor por perto. Uma proposta navegável continua vendendo depois da reunião.','Gartner · pesquisa com 646 compradores, 2025','https://www.gartner.com/en/sales/insights/b2b-buying-journey'],
+ ['PowerPoint = fala','Harvard: o slide foi avaliado igual a falar sem apoio visual. A apresentação navegável foi julgada mais organizada, envolvente e persuasiva.','Moulton, Türkay e Kosslyn · PLOS ONE, 2017','https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0178774']];
+function dataHTML(k){ return `<div class="cv dataC" style="--j:${k}"><div class="dh"><small>Por que sem slide</small><b>Slide se esquece. <span class="grad">Experiência se compra.</span></b></div><div class="stats">${DATA.map(d=>`<a class="st" href="${d[3]}" target="_blank" rel="noreferrer"><b>${d[0]}</b><span>${d[1]}</span><small>${d[2]} ↗</small></a>`).join('')}</div></div>` }
+function coverHTML(it,k,tint){ const [t,id,big]=it; if(t==='data') return dataHTML(k); const cls=big===1?' lead':big===2?' tall':''; let img,iss,l1,l2,tag,open,txt='';
   if(t==='job'){ const j=job(id); img=j.img?J+j.img[0]+'.jpg':null; iss=j.data; l1=j.cli; l2=j.acao; tag=j.papel; open='job:'+id; if(!img) txt=`<span>${j.text}<small>${j.papel} · ${j.local}</small></span>` }
   else if(t==='case'){ const c=CASES.find(x=>x.id===id); img=c.img; iss=c.st; l1='BAITA · '+c.k; l2=c.d; tag=c.how+' →'; open='room:'+id }
   else { const g=GAMES.find(x=>x.id===id); img=g.img[0]; iss='Publicado'; l1=g.t; l2=g.d; tag=g.k; open='room:'+id }
   return `<button class="cv${cls}${img?'':' txt'}" style="--j:${k}" data-open="${open}" aria-label="${MAST[id]}: abrir"><span class="ph">${img?`<img src="${img}" srcset="${sm(img)} 960w, ${img} 1800w" sizes="(max-width: 900px) 50vw, 34vw" alt="" loading="lazy">`:txt}</span><span class="cvt"><span class="mast">${MAST[id]}</span><span class="iss">Nº ${pad(k+1)} · ${iss}</span></span><span class="cvl"><small>${tag}</small><b>${l1}</b>${big?`<span>${l2}</span>`:''}</span><span class="gol">${t==='game'&&id!=='orbita'?'Jogar':'Entrar'} ↗</span></button>` }
 
-function bgList(p){ const out=[]; p.items.forEach(([t,id])=>{ if(t==='job'){ const j=job(id); if(j.img) out.push(J+j.img[0]+'.jpg', J+j.img[1]+'.jpg') } else if(t==='case'){ out.push(CASES.find(x=>x.id===id).img) } else { const g=GAMES.find(x=>x.id===id); out.push(...g.img.slice(0,2)) } }); return out.slice(0,6) }
+function bgList(p){ const out=[]; p.items.forEach(([t,id])=>{ if(t==='data') return; if(t==='job'){ const j=job(id); if(j.img) out.push(J+j.img[0]+'.jpg', J+j.img[1]+'.jpg') } else if(t==='case'){ out.push(CASES.find(x=>x.id===id).img) } else { const g=GAMES.find(x=>x.id===id); out.push(...g.img.slice(0,2)) } }); return out.slice(0,6) }
 
 /* ---------- monta as telas ---------- */
 const stage=$('#stage'), tabs=$('#tabs');
